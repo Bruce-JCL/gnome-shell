@@ -1384,8 +1384,10 @@ apply_discrete_gpu_env (GAppLaunchContext *context,
         continue;
 
       env_s = g_variant_get_strv (env, NULL);
-      for (j = 0; env_s[j] != NULL; j = j + 2)
+      for (j = 0; env_s[j] != NULL; j = j + 2){
+        g_debug ("aid_log:Setting env var for discrete GPU: %s=%s", env_s[j], env_s[j+1]);
         g_app_launch_context_setenv (context, env_s[j], env_s[j+1]);
+      }
       return;
     }
 
@@ -1428,11 +1430,18 @@ shell_app_launch (ShellApp           *app,
 
   global = shell_global_get ();
   context = shell_global_create_app_launch_context (global, timestamp, workspace);
+  char **env = g_app_launch_context_get_environment (context);
+  g_app_launch_context_unsetenv (context, "LIBGL_ALWAYS_SOFTWARE");
+  for (int i = 0; env && env[i]; i++)
+      g_warning("aid_log:launch env: %s", env[i]);
+  g_strfreev(env);
+
   if (gpu_pref == SHELL_APP_LAUNCH_GPU_APP_PREF)
     discrete_gpu = g_desktop_app_info_get_boolean (app->info, "PrefersNonDefaultGPU");
   else
     discrete_gpu = (gpu_pref == SHELL_APP_LAUNCH_GPU_DISCRETE);
 
+  g_warning("aid_log:Launching app %s with discrete GPU preference: %d", shell_app_get_name (app), discrete_gpu);
   if (discrete_gpu)
     apply_discrete_gpu_env (context, global);
 
