@@ -9,6 +9,54 @@ For more information about GNOME Shell, including instructions on how
 to build GNOME Shell from source and how to get involved with the project,
 see the [project wiki][project-wiki].
 
+## Debian packaging
+
+This tree also provides a Meson target to build a `gnome-shell` Debian
+package from the current build directory.
+
+After configuring and building the project, run:
+
+```sh
+ninja -C build gnome-shell-deb
+```
+
+or:
+
+```sh
+ninja -C build deb
+```
+
+The generated package is written to the build directory, for example:
+
+```sh
+/root/gnome-shell/build/gnome-shell_42.9-0ubuntu2.3_arm64.deb
+```
+
+The packaging step reuses the current build outputs, stages the runtime
+files that belong to the `gnome-shell` package, maps newly built shared
+libraries and typelibs into the package paths expected by the system
+package, and then creates a `.deb` with `dpkg-deb`.
+
+Package metadata is copied from the currently installed `gnome-shell`
+package by querying `dpkg`. The `Package`, `Version`, `Section`,
+`Priority`, `Architecture`, `Maintainer`, `Original-Maintainer`,
+`Depends`, `Recommends`, `Suggests`, `Provides`, `Breaks`,
+`Description`, and `Homepage` fields are reproduced from the installed
+package. `Installed-Size` is recalculated from the newly staged package
+contents, and `Conffiles` is written into the generated package control
+data.
+
+This target is intended for an already built tree. If the required build
+artifacts are missing, run the normal build first and then rerun the
+packaging target.
+
+To inspect or install the generated package, use:
+
+```sh
+dpkg-deb -c build/gnome-shell_*.deb
+sudo dpkg -i build/gnome-shell_*.deb
+```
+
 Bugs should be reported to the GNOME [bug tracking system][bug-tracker].
 Please refer to the [*Schedule* wiki page][schedule] to see the supported versions.
 
