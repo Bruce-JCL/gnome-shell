@@ -1450,6 +1450,7 @@ shell_global_create_app_launch_context (ShellGlobal *global,
     ws = meta_workspace_manager_get_workspace_by_index (workspace_manager, workspace);
 
   meta_launch_context_set_workspace (context, ws);
+  g_app_launch_context_unsetenv (G_APP_LAUNCH_CONTEXT (context), "LIBGL_ALWAYS_SOFTWARE");
 
   g_signal_connect (context,
                     "launched",
