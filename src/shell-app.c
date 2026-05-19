@@ -584,6 +584,7 @@ void
 shell_app_open_new_window (ShellApp      *app,
                            int            workspace)
 {
+  g_warning ("shell_app_open_new_window() is deprecated and should not be used; see bug #794567 for details");
   GActionGroup *group = NULL;
   const char * const *actions;
 
@@ -1505,12 +1506,14 @@ shell_app_launch_action (ShellApp        *app,
                          guint            timestamp,
                          int              workspace)
 {
+  g_warning("aid_log:Launching action %s for app %s", action_name, shell_app_get_name (app));
   ShellGlobal *global;
   GAppLaunchContext *context;
 
   global = shell_global_get ();
   context = shell_global_create_app_launch_context (global, timestamp, workspace);
-
+  g_app_launch_context_unsetenv (context, "LIBGL_ALWAYS_SOFTWARE");
+  g_warning("aid_log:remove LIBGL_ALWAYS_SOFTWARE env var for action launch");
   g_desktop_app_info_launch_action (G_DESKTOP_APP_INFO (app->info),
                                     action_name, context);
 
